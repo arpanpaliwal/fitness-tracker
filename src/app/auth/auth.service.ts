@@ -3,20 +3,35 @@ import { User } from './user.model';
 import { AuthData } from './auth-data.model';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 
 @Injectable()
 export class AuthService{
   authChange = new Subject<boolean>();
   private user: User;
 
-  constructor(private router: Router){}
+  constructor(private router: Router, private http: HttpClient){}
 
   registerUser(authData: AuthData){
     this.user = {
       email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString()
+      userId: 'djfkdjfk',
+      password: authData.password
     };
-    this.postAuth();
+    // create http options
+    const httpOptions: { headers: HttpHeaders; observe: any; } = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      }),
+      observe: 'response'
+    };
+    const myAuthData = JSON.stringify(authData);
+    this.http.post('http://localhost:8080/signup', myAuthData , httpOptions)
+    .subscribe((res: HttpResponse<any>) => {
+      if (res.status === 200){
+        this.postAuth();
+      }
+    });
   }
 
   private postAuth() {
@@ -27,7 +42,7 @@ export class AuthService{
   login(authData: AuthData){
     this.user = {
       email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString()
+      password: authData.password
     };
     this.postAuth();
   }
