@@ -7,6 +7,12 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 
 @Injectable()
 export class AuthService{
+   httpOptions: { headers: HttpHeaders; observe: any; } = {
+    headers: new HttpHeaders({
+      'Content-Type':  'application/json'
+    }),
+    observe: 'response'
+  };
   authChange = new Subject<boolean>();
   private user: User;
 
@@ -19,16 +25,11 @@ export class AuthService{
       password: authData.password
     };
     // create http options
-    const httpOptions: { headers: HttpHeaders; observe: any; } = {
-      headers: new HttpHeaders({
-        'Content-Type':  'application/json'
-      }),
-      observe: 'response'
-    };
     const myAuthData = JSON.stringify(authData);
-    this.http.post('http://localhost:8080/signup', myAuthData , httpOptions)
+    this.http.post('http://localhost:8080/signup', myAuthData , this.httpOptions)
     .subscribe((res: HttpResponse<any>) => {
       if (res.status === 200){
+        console.log(res.body);
         this.postAuth();
       }
     });
@@ -44,7 +45,14 @@ export class AuthService{
       email: authData.email,
       password: authData.password
     };
-    this.postAuth();
+    const myAuthData = JSON.stringify(authData);
+    this.http.post('http://localhost:8080/login', myAuthData , this.httpOptions)
+    .subscribe((res: HttpResponse<any>) => {
+      if (res.status === 200){
+        console.log(res.body);
+        this.postAuth();
+      }
+    });
   }
   logout(){
     this.user = null;
