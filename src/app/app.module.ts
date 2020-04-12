@@ -18,7 +18,8 @@ import { SidenavComponent } from './navigation/sidenav/sidenav.component';
 import { StopTrainingComponent } from './training/current-training/stop-training.component';
 import { AuthService } from './auth/auth.service';
 import { TrainingService } from './training/training.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS  } from '@angular/common/http';
+import {BasicAuthHttpInterceptor} from './auth/BasicAuthHTTPInterceptor';
 @NgModule({
   declarations: [
     AppComponent,
@@ -43,7 +44,11 @@ import { HttpClientModule } from '@angular/common/http';
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [AuthService, TrainingService],
+  providers: [
+    AuthService,
+    TrainingService,
+    { provide: HTTP_INTERCEPTORS, useClass: BasicAuthHttpInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
   entryComponents: [StopTrainingComponent]
 })

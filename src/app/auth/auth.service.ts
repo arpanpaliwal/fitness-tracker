@@ -46,12 +46,15 @@ export class AuthService{
       email: authData.email,
       password: authData.password
     };
+    const authString = 'Basic ' + btoa(authData.email + ':' + authData.password);
     const headers = new HttpHeaders(authData ? {
-      authorization : 'Basic ' + btoa(authData.email + ':' + authData.password)
+      authorization : authString
   } : {});
     this.http.get('http://localhost:8080/user', {headers})
     .subscribe(response => {
       if (response['name']){
+        sessionStorage.setItem('name', response['name']);
+        sessionStorage.setItem('authString', authString);
         this.authenticated = true;
         console.log(response);
         this.postAuth();
