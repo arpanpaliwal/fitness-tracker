@@ -7,6 +7,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 
 @Injectable()
 export class AuthService{
+  authenticated = false;
    httpOptions: { headers: HttpHeaders; observe: any; } = {
     headers: new HttpHeaders({
       'Content-Type':  'application/json'
@@ -45,12 +46,17 @@ export class AuthService{
       email: authData.email,
       password: authData.password
     };
-    const myAuthData = JSON.stringify(authData);
-    this.http.post('http://localhost:8080/login', myAuthData , this.httpOptions)
-    .subscribe((res: HttpResponse<any>) => {
-      if (res.status === 200){
-        console.log(res.body);
+    const headers = new HttpHeaders(authData ? {
+      authorization : 'Basic ' + btoa(authData.email + ':' + authData.password)
+  } : {});
+    this.http.get('http://localhost:8080/user', {headers})
+    .subscribe(response => {
+      if (response['name']){
+        this.authenticated = true;
+        console.log(response);
         this.postAuth();
+      }else{
+        this.authenticated = false;
       }
     });
   }
